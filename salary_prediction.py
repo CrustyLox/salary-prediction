@@ -26,12 +26,12 @@ y = df['Attrition']
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 #Train Logistic Regression Model
-model = LogisticRegression(max_iter=1000)
-model.fit(X_train, y_train)
+attrition_model = LogisticRegression(max_iter=1000)
+attrition_model.fit(X_train, y_train)
 
 #Predict
-y_pred = model.predict(X_test)
-y_pred_proba = model.predict_proba(X_test)[:, 1]  # Probabilities for class 1 (Attrition = Yes)
+y_pred = attrition_model.predict(X_test)
+y_pred_proba = attrition_model.predict_proba(X_test)[:, 1]  # Probabilities for class 1 (Attrition = Yes)
 
 #Evaluate the Model
 print("Confusion Matrix:\n", confusion_matrix(y_test, y_pred))
@@ -88,3 +88,22 @@ plt.ylabel('Predicted Future Salary')
 plt.title('Actual vs Predicted Future Salary')
 plt.grid(True)
 plt.show()
+
+
+# (PHASE 4)
+# Predict probabilities for the whole dataset (not just test set)
+probs = attrition_model.predict_proba(X)
+
+# Calculate P_stay which is 1-p of leaving and use employees likely to stay
+P_stay = 1 - probs[:, 1]
+stay_mask = (P_stay > 0.6)
+
+# Filter the original X_salary data for these employees and create a new data frame
+X_likely_to_stay = X_salary[stay_mask]
+
+# Predict Future Salary only for employees likely to stay
+predicted_future_salaries = salary_regressor.predict(X_likely_to_stay)
+
+# Create a final DataFrame with predictions
+final_likely_to_stay = X_likely_to_stay.copy()
+final_likely_to_stay['PredictedFutureSalary'] = predicted_future_salaries
