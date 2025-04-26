@@ -47,3 +47,7 @@ plt.title('Receiver Operating Characteristic (ROC) Curve')
 plt.legend()
 plt.grid(True)
 plt.show()
+
+# Increment column and future salary column created
+df["Increment"] = df["PerformanceRating"].apply(lambda x: 1.10 if x == 4 else 1.05)
+df["FutureSalary"] = df["MonthlyIncome"] * df["Increment"]
