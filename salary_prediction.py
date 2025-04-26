@@ -1,10 +1,13 @@
-#Libraries
+# Libraries
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score, roc_curve
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score, roc_curve, r2_score, mean_squared_error
 import matplotlib.pyplot as plt
+import joblib
+import numpy as np
 
 #Load the Dataset
 df = pd.read_csv('SalaryData.csv')
@@ -48,6 +51,30 @@ plt.legend()
 plt.grid(True)
 plt.show()
 
-# Increment column and future salary column created
+# Increment column and future salary column created(PHASE 2)
 df["Increment"] = df["PerformanceRating"].apply(lambda x: 1.10 if x == 4 else 1.05)
 df["FutureSalary"] = df["MonthlyIncome"] * df["Increment"]
+
+
+# (PHASE 3)
+# Define Features (X) and Target (y) for Salary Prediction
+X_salary = df.drop(['Attrition', 'FutureSalary', 'Increment'], axis=1)
+y_salary = df['FutureSalary']
+
+# Split into Train and Test for Salary Prediction
+X_train_sal, X_test_sal, y_train_sal, y_test_sal = train_test_split(X_salary, y_salary, test_size=0.2, random_state=42)
+
+# Train Random Forest Regressor
+salary_regressor = RandomForestRegressor(n_estimators=100, random_state=42)
+salary_regressor.fit(X_train_sal, y_train_sal)
+
+# Predict Future Salaries
+y_pred_sal = salary_regressor.predict(X_test_sal)
+
+# Evaluate Salary Prediction Model
+r2 = r2_score(y_test_sal, y_pred_sal)
+rmse = np.sqrt(mean_squared_error(y_test_sal, y_pred_sal))
+
+print("\nRegression Model Evaluation for Future Salary Prediction:")
+print(f"R² Score: {r2:.4f}")
+print(f"Root Mean Squared Error (RMSE): {rmse:.2f}")
