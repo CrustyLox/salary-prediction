@@ -78,3 +78,13 @@ rmse = np.sqrt(mean_squared_error(y_test_sal, y_pred_sal))
 print("\nRegression Model Evaluation for Future Salary Prediction:")
 print(f"R² Score: {r2:.4f}")
 print(f"Root Mean Squared Error (RMSE): {rmse:.2f}")
+
+# Scatter plot: Actual vs Predicted Future Salaries
+plt.figure(figsize=(8,6))
+plt.scatter(y_test_sal, y_pred_sal, color='blue', alpha=0.6)
+plt.plot([y_test_sal.min(), y_test_sal.max()], [y_test_sal.min(), y_test_sal.max()], color='red', linestyle='--')
+plt.xlabel('Actual Future Salary')
+plt.ylabel('Predicted Future Salary')
+plt.title('Actual vs Predicted Future Salary')
+plt.grid(True)
+plt.show()
