@@ -107,3 +107,28 @@ predicted_future_salaries = salary_regressor.predict(X_likely_to_stay)
 # Create a final DataFrame with predictions
 final_likely_to_stay = X_likely_to_stay.copy()
 final_likely_to_stay['PredictedFutureSalary'] = predicted_future_salaries
+
+#(PHASE 5)
+probs = attrition_model.predict_proba(X)  # X is original features set
+P_leave = probs[:, 1]  # Probability of leaving 
+
+# Predict Future Salaries for ALL employees
+future_salary_all = salary_regressor.predict(X_salary)
+
+# Calculate Expected Loss for each employee
+expected_loss = P_leave * future_salary_all
+
+# Add Expected Loss to a new DataFrame(needed?)
+final_risk_df = pd.DataFrame({
+    'P_leave': P_leave,
+    'FutureSalary': future_salary_all,
+    'ExpectedLoss': expected_loss
+})
+
+# Sort by highest expected loss (needed?)
+final_risk_df = final_risk_df.sort_values(by='ExpectedLoss', ascending=False)
+
+# Calculate Total Expected Salary Loss
+total_expected_loss = expected_loss.sum()
+
+print("\nTotal Expected Salary Loss Across Company: ${:,.2f}".format(total_expected_loss))
